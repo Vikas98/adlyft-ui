@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
-  const [email, setEmail] = useState('demo@adlyft.com');
-  const [password, setPassword] = useState('demo123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,15 +20,7 @@ export default function Login() {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      // Demo mode fallback: if backend is offline, login with demo credentials
-      if (email === 'demo@adlyft.com' && password === 'demo123') {
-        // Store a fake token and user
-        localStorage.setItem('adlyft_token', 'demo_token_offline');
-        localStorage.setItem('adlyft_user', JSON.stringify({ name: 'Demo Advertiser', email: 'demo@adlyft.com' }));
-        window.location.href = '/';
-      } else {
-        setError(err.response?.data?.message || 'Login failed. Check credentials or try demo@adlyft.com / demo123');
-      }
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -52,13 +44,6 @@ export default function Login() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-1">Welcome back</h2>
           <p className="text-sm text-gray-500 mb-6">Sign in to your advertiser account</p>
-
-          {/* Demo hint */}
-          <div className="bg-primary-50 border border-primary-100 rounded-lg p-3 mb-6">
-            <p className="text-xs text-primary-700">
-              <strong>Demo:</strong> demo@adlyft.com / demo123
-            </p>
-          </div>
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
@@ -101,6 +86,11 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">Sign Up</Link>
+          </p>
         </div>
       </div>
     </div>
