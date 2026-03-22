@@ -5,12 +5,18 @@ import PublisherList from '../components/publishers/PublisherList';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
 import AddPublisherModal from '../components/publishers/AddPublisherModal';
+import AdSlotManager from '../components/publishers/AdSlotManager';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { getPublishersApi, createPublisherApi, updatePublisherApi, deletePublisherApi } from '../services/api';
 import { mockPublishers } from '../data/mockData';
 import { formatNumber } from '../utils/formatters';
+import { useAuth } from '../context/AuthContext';
 
 export default function Publishers() {
+  const { user } = useAuth();
+  const userRole = user?.role || 'advertiser';
+  const isAdmin = userRole === 'admin';
+
   const [publishers, setPublishers] = useState([]);
   const [category, setCategory] = useState('All');
   const [search, setSearch] = useState('');
@@ -45,7 +51,6 @@ export default function Publishers() {
       await createPublisherApi(data);
       await fetchPublishers();
     } catch {
-      // In demo mode, optimistically add to list
       setPublishers((prev) => [...prev, { ...data, _id: crypto.randomUUID() }]);
     }
   };
@@ -90,22 +95,24 @@ export default function Publishers() {
       )}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">{filtered.length} publishers available</p>
-        <Button onClick={() => setAddModalOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Add Publisher
-        </Button>
+        {isAdmin && (
+          <Button onClick={() => setAddModalOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Publisher
+          </Button>
+        )}
       </div>
       <PublisherFilters category={category} setCategory={setCategory} search={search} setSearch={setSearch} />
       <PublisherList
         publishers={filtered}
         onSelect={setSelectedPublisher}
-        onEdit={setEditingPublisher}
-        onDelete={setDeletingPublisher}
+        onEdit={isAdmin ? setEditingPublisher : undefined}
+        onDelete={isAdmin ? setDeletingPublisher : undefined}
       />
 
       {/* Publisher Detail Modal */}
       {selectedPublisher && (
-        <Modal isOpen={!!selectedPublisher} onClose={() => setSelectedPublisher(null)} title={selectedPublisher.name} size="md">
+        <Modal isOpen={!!selectedPublisher} onClose={() => setSelectedPublisher(null)} title={selectedPublisher.name} size="lg">
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-3xl">
@@ -135,27 +142,32 @@ export default function Publishers() {
                 <p className="text-xs text-gray-500">Ad Slots</p>
               </div>
             </div>
+            <AdSlotManager publisherId={selectedPublisher._id} userRole={userRole} />
           </div>
         </Modal>
       )}
 
       {/* Add Publisher Modal */}
-      <AddPublisherModal
-        isOpen={addModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        onSave={handleAddSave}
-      />
+      {isAdmin && (
+        <AddPublisherModal
+          isOpen={addModalOpen}
+          onClose={() => setAddModalOpen(false)}
+          onSave={handleAddSave}
+        />
+      )}
 
       {/* Edit Publisher Modal */}
-      <AddPublisherModal
-        isOpen={!!editingPublisher}
-        onClose={() => setEditingPublisher(null)}
-        onSave={handleEditSave}
-        publisher={editingPublisher}
-      />
+      {isAdmin && (
+        <AddPublisherModal
+          isOpen={!!editingPublisher}
+          onClose={() => setEditingPublisher(null)}
+          onSave={handleEditSave}
+          publisher={editingPublisher}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
-      {deletingPublisher && (
+      {isAdmin && deletingPublisher && (
         <Modal isOpen={!!deletingPublisher} onClose={() => setDeletingPublisher(null)} title="Delete Publisher" size="sm">
           <p className="text-sm text-gray-600 mb-6">
             Are you sure you want to delete <strong>{deletingPublisher.name}</strong>? This action cannot be undone.
