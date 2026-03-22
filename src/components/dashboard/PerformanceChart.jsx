@@ -2,6 +2,14 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function PerformanceChart({ data = [] }) {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[280px] text-sm text-gray-400">
+        No performance data available
+      </div>
+    );
+  }
+
   const chartData = data.slice(-14).map((d) => ({
     ...d,
     date: d.date?.slice(5) || d.date,
