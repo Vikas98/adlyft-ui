@@ -4,17 +4,21 @@ import Card from '../components/common/Card';
 import CreateCampaignForm from '../components/campaigns/CreateCampaignForm';
 import { createCampaignApi, uploadAdApi, getPublishersApi } from '../services/api';
 import { mockPublishers } from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import { getErrorMessage } from '../services/api';
 
 export default function CreateCampaign() {
   const [loading, setLoading] = useState(false);
   const [publishers, setPublishers] = useState([]);
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   useEffect(() => {
     const fetchPublishers = async () => {
       try {
         const res = await getPublishersApi();
-        setPublishers(res.data.publishers || res.data || []);
+        const rawPublishers = res.data?.data;
+        setPublishers(Array.isArray(rawPublishers) ? rawPublishers : []);
       } catch {
         setPublishers(mockPublishers);
       }
@@ -33,7 +37,9 @@ export default function CreateCampaign() {
         try {
           const uploadRes = await uploadAdApi(formData);
           adUrl = uploadRes.data.url || '';
-        } catch { /* ignore upload errors in demo mode */ }
+        } catch (uploadErr) {
+          addToast('Ad creative upload failed. Campaign will be created without an ad file.', 'warning');
+        }
       }
 
       const campaignData = {
@@ -49,10 +55,16 @@ export default function CreateCampaign() {
       };
 
       await createCampaignApi(campaignData);
+      addToast('Campaign created successfully!', 'success');
       navigate('/campaigns');
-    } catch {
-      // Demo mode: just redirect
-      navigate('/campaigns');
+    } catch (err) {
+      const msg = getErrorMessage(err);
+      if (!navigator.onLine || msg.includes('Network')) {
+        addToast('Demo mode — campaign not saved to server.', 'warning');
+        navigate('/campaigns');
+      } else {
+        addToast(msg || 'Failed to create campaign. Please try again.', 'error');
+      }
     } finally {
       setLoading(false);
     }
