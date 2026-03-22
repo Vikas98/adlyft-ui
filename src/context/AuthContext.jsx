@@ -28,6 +28,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('adlyft_user', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
+    setLoading(false);
     return newUser;
   };
 
@@ -38,6 +39,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('adlyft_user', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
+    setLoading(false);
     return newUser;
   };
 

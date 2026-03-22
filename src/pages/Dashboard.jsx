@@ -32,12 +32,22 @@ export default function Dashboard() {
         setTimeseries(tsRes.data.data || tsRes.data || []);
         setCampaigns(campRes.data.campaigns || campRes.data || []);
         setActivities([]);
-      } catch {
-        setOverview(mockAnalyticsOverview);
-        setTimeseries(mockTimeseries);
-        setCampaigns(mockCampaigns.filter((c) => c.status === 'active'));
-        setActivities(mockActivities);
-        setIsDemo(true);
+      } catch (err) {
+        console.error('Dashboard data fetch error:', err);
+        try {
+          setOverview(mockAnalyticsOverview);
+          setTimeseries(mockTimeseries || []);
+          setCampaigns((mockCampaigns || []).filter((c) => c.status === 'active'));
+          setActivities(mockActivities || []);
+          setIsDemo(true);
+        } catch (mockErr) {
+          console.error('Mock data error:', mockErr);
+          setOverview({ totalImpressions: 0, totalClicks: 0, avgCtr: 0, totalSpend: 0 });
+          setTimeseries([]);
+          setCampaigns([]);
+          setActivities([]);
+          setIsDemo(true);
+        }
       } finally {
         setLoading(false);
       }
