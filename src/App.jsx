@@ -13,7 +13,6 @@ import Analytics from './pages/Analytics';
 import Billing from './pages/Billing';
 import Settings from './pages/Settings';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import ErrorBoundary from './components/common/ErrorBoundary';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -24,21 +23,6 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-              <Route index element={<Dashboard />} />
-              <Route path="campaigns" element={<Campaigns />} />
-              <Route path="campaigns/create" element={<CreateCampaign />} />
-              <Route path="publishers" element={<Publishers />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="billing" element={<Billing />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Routes>
       <ToastProvider>
         <AuthProvider>
           <BrowserRouter>
