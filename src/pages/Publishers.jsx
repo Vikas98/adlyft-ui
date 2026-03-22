@@ -30,6 +30,13 @@ export default function Publishers() {
     } catch (err) {
       const msg = getErrorMessage(err);
       if (!navigator.onLine || msg.includes('Network')) {
+  useEffect(() => {
+    const fetchPublishers = async () => {
+      try {
+        const res = await getPublishersApi();
+        const rawPublishers = res.data?.data;
+        setPublishers(Array.isArray(rawPublishers) ? rawPublishers : []);
+      } catch {
         setPublishers(mockPublishers);
         setIsDemo(true);
       } else {

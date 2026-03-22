@@ -45,6 +45,37 @@ export default function Dashboard() {
         setIsDemo(true);
       } else {
         setError(msg);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [ovRes, tsRes, campRes] = await Promise.all([
+          getAnalyticsOverviewApi(),
+          getAnalyticsTimeseriesApi('30d'),
+          getCampaignsApi({ status: 'active' }),
+        ]);
+        setOverview(ovRes.data?.data || ovRes.data || {});
+        setTimeseries(tsRes.data?.data || []);
+        const rawCampaigns = campRes.data?.data;
+        setCampaigns(Array.isArray(rawCampaigns) ? rawCampaigns : []);
+        setActivities([]);
+      } catch (err) {
+        console.error('Dashboard data fetch error:', err);
+        try {
+          setOverview(mockAnalyticsOverview);
+          setTimeseries(mockTimeseries || []);
+          setCampaigns((mockCampaigns || []).filter((c) => c.status === 'active'));
+          setActivities(mockActivities || []);
+          setIsDemo(true);
+        } catch (mockErr) {
+          console.error('Mock data error:', mockErr);
+          setOverview({ totalImpressions: 0, totalClicks: 0, avgCtr: 0, totalSpend: 0 });
+          setTimeseries([]);
+          setCampaigns([]);
+          setActivities([]);
+          setIsDemo(true);
+        }
+      } finally {
+        setLoading(false);
       }
     } finally {
       setLoading(false);

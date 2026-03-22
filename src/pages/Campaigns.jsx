@@ -26,6 +26,13 @@ export default function Campaigns() {
     } catch (err) {
       const msg = getErrorMessage(err);
       if (!navigator.onLine || msg.includes('Network')) {
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const res = await getCampaignsApi();
+        const rawCampaigns = res.data?.data;
+        setCampaigns(Array.isArray(rawCampaigns) ? rawCampaigns : []);
+      } catch {
         setCampaigns(mockCampaigns);
         setIsDemo(true);
       } else {

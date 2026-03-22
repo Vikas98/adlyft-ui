@@ -36,6 +36,19 @@ export default function Analytics() {
       const msg = getErrorMessage(err);
       if (!navigator.onLine || msg.includes('Network')) {
         const days = selectedRange === '7d' ? 7 : selectedRange === '90d' ? 90 : 30;
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [tsRes, campRes] = await Promise.all([
+          getAnalyticsTimeseriesApi(range),
+          getAnalyticsCampaignsApi(),
+        ]);
+        setTimeseries(tsRes.data?.data || []);
+        const rawCampaigns = campRes.data?.data;
+        setTopCampaigns(Array.isArray(rawCampaigns) ? rawCampaigns : []);
+      } catch {
+        const days = range === '7d' ? 7 : range === '90d' ? 90 : 30;
         setTimeseries(mockTimeseries.slice(-days));
         setTopCampaigns(mockCampaigns);
         setIsDemo(true);

@@ -28,6 +28,14 @@ export default function Billing() {
     } catch (err) {
       const msg = getErrorMessage(err);
       if (!navigator.onLine || msg.includes('Network')) {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [ovRes, invRes] = await Promise.all([getBillingOverviewApi(), getInvoicesApi()]);
+        setOverview(ovRes.data?.data || ovRes.data || {});
+        const rawInvoices = invRes.data?.data;
+        setInvoices(Array.isArray(rawInvoices) ? rawInvoices : []);
+      } catch {
         setOverview(mockBillingOverview);
         setInvoices(mockInvoices);
         setIsDemo(true);
