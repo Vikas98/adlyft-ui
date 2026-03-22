@@ -5,7 +5,7 @@ import { Megaphone } from 'lucide-react';
 
 const STATUSES = ['all', 'active', 'paused', 'completed', 'draft'];
 
-export default function CampaignList({ campaigns = [], onStatusChange }) {
+export default function CampaignList({ campaigns = [], onStatusChange, onDelete }) {
   const [filter, setFilter] = useState('all');
 
   const filtered = filter === 'all' ? campaigns : campaigns.filter((c) => c.status === filter);
@@ -30,7 +30,7 @@ export default function CampaignList({ campaigns = [], onStatusChange }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((c) => (
-            <CampaignCard key={c._id} campaign={c} onStatusChange={onStatusChange} />
+            <CampaignCard key={c._id} campaign={c} onStatusChange={onStatusChange} onDelete={onDelete} />
           ))}
         </div>
       )}

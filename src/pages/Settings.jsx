@@ -74,6 +74,17 @@ export default function Settings() {
           <Input label="Full Name" value={profile?.name || ''} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
           <Input label="Email" type="email" value={profile?.email || ''} onChange={(e) => setProfile({ ...profile, email: e.target.value })} />
           <Input label="Company" value={profile?.company || ''} onChange={(e) => setProfile({ ...profile, company: e.target.value })} />
+          {profile?.role && (
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">Role</label>
+              <input
+                type="text"
+                readOnly
+                value={profile.role}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 capitalize"
+              />
+            </div>
+          )}
           <Input label="Phone" value={profile?.phone || ''} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} />
           <Input label="Website" type="url" value={profile?.website || ''} onChange={(e) => setProfile({ ...profile, website: e.target.value })} />
           <div className="flex items-center gap-3">

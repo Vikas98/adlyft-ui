@@ -7,6 +7,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Campaigns from './pages/Campaigns';
 import CreateCampaign from './pages/CreateCampaign';
+import CampaignDetail from './pages/CampaignDetail';
+import EditCampaign from './pages/EditCampaign';
 import Publishers from './pages/Publishers';
 import Analytics from './pages/Analytics';
 import Billing from './pages/Billing';
@@ -31,6 +33,8 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="campaigns" element={<Campaigns />} />
             <Route path="campaigns/create" element={<CreateCampaign />} />
+            <Route path="campaigns/:id" element={<CampaignDetail />} />
+            <Route path="campaigns/:id/edit" element={<EditCampaign />} />
             <Route path="publishers" element={<Publishers />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="billing" element={<Billing />} />

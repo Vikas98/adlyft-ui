@@ -43,6 +43,9 @@ export const deleteCampaignApi = (id) => api.delete(`/campaigns/${id}`);
 // Publishers
 export const getPublishersApi = (params) => api.get('/publishers', { params });
 export const getPublisherApi = (id) => api.get(`/publishers/${id}`);
+export const createPublisherApi = (data) => api.post('/publishers', data);
+export const updatePublisherApi = (id, data) => api.put(`/publishers/${id}`, data);
+export const deletePublisherApi = (id) => api.delete(`/publishers/${id}`);
 
 // Slots
 export const getSlotsApi = (params) => api.get('/slots', { params });
