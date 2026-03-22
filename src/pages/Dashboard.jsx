@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, MousePointer, DollarSign, Megaphone, Plus, AlertTriangle } from 'lucide-react';
+import { TrendingUp, MousePointer, DollarSign, Megaphone, Plus, AlertTriangle, RefreshCw } from 'lucide-react';
 import Card from '../components/common/Card';
 import StatsCard from '../components/dashboard/StatsCard';
 import CampaignTable from '../components/dashboard/CampaignTable';
@@ -8,7 +8,7 @@ import PerformanceChart from '../components/dashboard/PerformanceChart';
 import RecentActivity from '../components/dashboard/RecentActivity';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
-import { getAnalyticsOverviewApi, getAnalyticsTimeseriesApi, getCampaignsApi } from '../services/api';
+import { getAnalyticsOverviewApi, getAnalyticsTimeseriesApi, getCampaignsApi, getErrorMessage } from '../services/api';
 import { mockAnalyticsOverview, mockTimeseries, mockCampaigns, mockActivities } from '../data/mockData';
 import { formatCurrency, formatNumber, formatPercentage } from '../utils/formatters';
 
@@ -19,33 +19,54 @@ export default function Dashboard() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [ovRes, tsRes, campRes] = await Promise.all([
-          getAnalyticsOverviewApi(),
-          getAnalyticsTimeseriesApi('30d'),
-          getCampaignsApi({ status: 'active' }),
-        ]);
-        setOverview(ovRes.data);
-        setTimeseries(tsRes.data.data || tsRes.data || []);
-        setCampaigns(campRes.data.campaigns || campRes.data || []);
-        setActivities([]);
-      } catch {
+  const fetchData = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const [ovRes, tsRes, campRes] = await Promise.all([
+        getAnalyticsOverviewApi(),
+        getAnalyticsTimeseriesApi('30d'),
+        getCampaignsApi({ status: 'active' }),
+      ]);
+      setOverview(ovRes.data);
+      setTimeseries(tsRes.data.data || tsRes.data || []);
+      setCampaigns(campRes.data.campaigns || campRes.data || []);
+      setActivities([]);
+      setIsDemo(false);
+    } catch (err) {
+      const msg = getErrorMessage(err);
+      if (!navigator.onLine || msg.includes('Network')) {
         setOverview(mockAnalyticsOverview);
         setTimeseries(mockTimeseries);
         setCampaigns(mockCampaigns.filter((c) => c.status === 'active'));
         setActivities(mockActivities);
         setIsDemo(true);
-      } finally {
-        setLoading(false);
+      } else {
+        setError(msg);
       }
-    };
-    fetchData();
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchData(); }, []);
 
   if (loading) return <LoadingSpinner className="h-64" size="lg" />;
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="bg-white rounded-xl border border-red-100 shadow-sm p-8 max-w-md w-full text-center">
+          <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+          <p className="text-gray-700 font-medium mb-1">Failed to load dashboard</p>
+          <p className="text-sm text-gray-500 mb-4">{error}</p>
+          <Button onClick={fetchData}><RefreshCw className="h-4 w-4" />Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

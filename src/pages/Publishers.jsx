@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 import PublisherFilters from '../components/publishers/PublisherFilters';
 import PublisherList from '../components/publishers/PublisherList';
 import Modal from '../components/common/Modal';
 import PublisherCard from '../components/publishers/PublisherCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import Button from '../components/common/Button';
 import { getPublishersApi } from '../services/api';
 import { mockPublishers } from '../data/mockData';
 import { formatNumber } from '../utils/formatters';
+import { getErrorMessage } from '../services/api';
 
 export default function Publishers() {
   const [publishers, setPublishers] = useState([]);
@@ -16,21 +18,29 @@ export default function Publishers() {
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState(null);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchPublishers = async () => {
-      try {
-        const res = await getPublishersApi();
-        setPublishers(res.data.publishers || res.data || []);
-      } catch {
+  const fetchPublishers = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await getPublishersApi();
+      setPublishers(res.data.publishers || res.data || []);
+      setIsDemo(false);
+    } catch (err) {
+      const msg = getErrorMessage(err);
+      if (!navigator.onLine || msg.includes('Network')) {
         setPublishers(mockPublishers);
         setIsDemo(true);
-      } finally {
-        setLoading(false);
+      } else {
+        setError(msg);
       }
-    };
-    fetchPublishers();
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchPublishers(); }, []);
 
   const filtered = publishers.filter((p) => {
     const matchCategory = category === 'All' || p.category === category;
@@ -39,6 +49,19 @@ export default function Publishers() {
   });
 
   if (loading) return <LoadingSpinner className="h-64" size="lg" />;
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="bg-white rounded-xl border border-red-100 shadow-sm p-8 max-w-md w-full text-center">
+          <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+          <p className="text-gray-700 font-medium mb-1">Failed to load publishers</p>
+          <p className="text-sm text-gray-500 mb-4">{error}</p>
+          <Button onClick={fetchPublishers}><RefreshCw className="h-4 w-4" />Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

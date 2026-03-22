@@ -6,6 +6,8 @@ import Input from '../components/common/Input';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { getProfileApi, updateProfileApi, getApiKeyApi, regenerateApiKeyApi } from '../services/api';
 import { mockProfile } from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import { getErrorMessage } from '../services/api';
 
 export default function Settings() {
   const [profile, setProfile] = useState(null);
@@ -13,7 +15,7 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const { addToast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,11 +39,9 @@ export default function Settings() {
     setSaving(true);
     try {
       await updateProfileApi(profile);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      addToast('Profile saved successfully.', 'success');
+    } catch (err) {
+      addToast(getErrorMessage(err) || 'Failed to save profile.', 'error');
     } finally {
       setSaving(false);
     }
@@ -51,9 +51,15 @@ export default function Settings() {
     try {
       const res = await regenerateApiKeyApi();
       setApiKey(res.data.apiKey || 'adlyft_new_key_xxxx5678');
-    } catch {
-      setApiKey('adlyft_demo_key_' + Math.random().toString(36).slice(2, 10));
+      addToast('API key regenerated successfully.', 'success');
+    } catch (err) {
+      addToast(getErrorMessage(err) || 'Failed to regenerate API key.', 'error');
     }
+  };
+
+  const handleCopyKey = () => {
+    navigator.clipboard.writeText(apiKey);
+    addToast('API key copied to clipboard.', 'info');
   };
 
   if (loading) return <LoadingSpinner className="h-64" size="lg" />;
@@ -76,10 +82,7 @@ export default function Settings() {
           <Input label="Company" value={profile?.company || ''} onChange={(e) => setProfile({ ...profile, company: e.target.value })} />
           <Input label="Phone" value={profile?.phone || ''} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} />
           <Input label="Website" type="url" value={profile?.website || ''} onChange={(e) => setProfile({ ...profile, website: e.target.value })} />
-          <div className="flex items-center gap-3">
-            <Button type="submit" loading={saving}>Save Changes</Button>
-            {saved && <span className="text-sm text-green-600">✓ Saved successfully</span>}
-          </div>
+          <Button type="submit" loading={saving}>Save Changes</Button>
         </form>
       </Card>
 
@@ -94,7 +97,7 @@ export default function Settings() {
             value={apiKey}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 font-mono"
           />
-          <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(apiKey)}>
+          <Button variant="outline" size="sm" onClick={handleCopyKey}>
             <Copy className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={handleRegenerateKey}>
