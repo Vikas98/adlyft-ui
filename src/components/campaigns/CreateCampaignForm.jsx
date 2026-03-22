@@ -9,7 +9,7 @@ import { CAMPAIGN_STEPS } from '../../utils/constants';
 import { Upload, CheckCircle } from 'lucide-react';
 
 const initialForm = {
-  name: '', objective: 'awareness', startDate: '', endDate: '', budget: '', targetUrl: '',
+  name: '', objective: 'brand_awareness', startDate: '', endDate: '', budget: '', dailyBudget: '', targetUrl: '',
   publisherId: null, publisherName: '', slotId: null, slotName: '', adFile: null,
 };
 
@@ -50,9 +50,8 @@ export default function CreateCampaignForm({ publishers = [], onSubmit, loading 
             <Input label="Campaign Name" value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="e.g. Summer Sale 2024" />
             <Select label="Objective" value={form.objective} onChange={(e) => update('objective', e.target.value)}
               options={[
-                { value: 'awareness', label: 'Brand Awareness' },
+                { value: 'brand_awareness', label: 'Brand Awareness' },
                 { value: 'traffic', label: 'Drive Traffic' },
-                { value: 'installs', label: 'App Installs' },
                 { value: 'conversions', label: 'Conversions' },
               ]}
             />
@@ -60,7 +59,10 @@ export default function CreateCampaignForm({ publishers = [], onSubmit, loading 
               <Input label="Start Date" type="date" value={form.startDate} onChange={(e) => update('startDate', e.target.value)} />
               <Input label="End Date" type="date" value={form.endDate} onChange={(e) => update('endDate', e.target.value)} />
             </div>
-            <Input label="Total Budget (₹)" type="number" value={form.budget} onChange={(e) => update('budget', e.target.value)} placeholder="50000" />
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Total Budget (₹)" type="number" value={form.budget} onChange={(e) => update('budget', e.target.value)} placeholder="50000" />
+              <Input label="Daily Budget (₹)" type="number" value={form.dailyBudget} onChange={(e) => update('dailyBudget', e.target.value)} placeholder="5000" />
+            </div>
             <Input label="Target URL" type="url" value={form.targetUrl} onChange={(e) => update('targetUrl', e.target.value)} placeholder="https://yoursite.com" />
           </div>
         )}
@@ -117,7 +119,8 @@ export default function CreateCampaignForm({ publishers = [], onSubmit, loading 
                 ['Objective', form.objective],
                 ['Start Date', form.startDate],
                 ['End Date', form.endDate],
-                ['Budget', form.budget ? `₹${Number(form.budget).toLocaleString('en-IN')}` : '—'],
+                ['Total Budget', form.budget ? `₹${Number(form.budget).toLocaleString('en-IN')}` : '—'],
+                ['Daily Budget', form.dailyBudget ? `₹${Number(form.dailyBudget).toLocaleString('en-IN')}` : '—'],
                 ['Publisher', form.publisherName || '—'],
                 ['Ad Slot', form.slotName || '—'],
                 ['Creative', form.adFile?.name || '—'],

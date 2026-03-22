@@ -4,7 +4,7 @@ import { Plus, AlertTriangle } from 'lucide-react';
 import Button from '../components/common/Button';
 import CampaignList from '../components/campaigns/CampaignList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { getCampaignsApi, updateCampaignStatusApi } from '../services/api';
+import { getCampaignsApi, updateCampaignStatusApi, deleteCampaignApi } from '../services/api';
 import { mockCampaigns } from '../data/mockData';
 
 export default function Campaigns() {
@@ -37,6 +37,13 @@ export default function Campaigns() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await deleteCampaignApi(id);
+    } catch { /* ignore errors in demo mode */ }
+    setCampaigns((prev) => prev.filter((c) => c._id !== id));
+  };
+
   if (loading) return <LoadingSpinner className="h-64" size="lg" />;
 
   return (
@@ -58,7 +65,7 @@ export default function Campaigns() {
           </Button>
         </Link>
       </div>
-      <CampaignList campaigns={campaigns} onStatusChange={handleStatusChange} />
+      <CampaignList campaigns={campaigns} onStatusChange={handleStatusChange} onDelete={handleDelete} />
     </div>
   );
 }

@@ -30,7 +30,7 @@ export default function CreateCampaign() {
       let adUrl = '';
       if (form.adFile) {
         const formData = new FormData();
-        formData.append('file', form.adFile);
+        formData.append('image', form.adFile);
         try {
           const uploadRes = await uploadAdApi(formData);
           adUrl = uploadRes.data.url || '';
@@ -42,7 +42,8 @@ export default function CreateCampaign() {
         objective: form.objective,
         startDate: form.startDate,
         endDate: form.endDate,
-        budget: Number(form.budget),
+        totalBudget: Number(form.budget),
+        dailyBudget: form.dailyBudget ? Number(form.dailyBudget) : undefined,
         targetUrl: form.targetUrl,
         publisherId: form.publisherId,
         slotId: form.slotId,
