@@ -9,7 +9,7 @@ import { CAMPAIGN_STEPS } from '../../utils/constants';
 import { Upload, CheckCircle } from 'lucide-react';
 
 const initialForm = {
-  name: '', objective: 'brand_awareness', startDate: '', endDate: '', budget: '', dailyBudget: '', targetUrl: '',
+  name: '', objective: 'brand_awareness', startDate: '', endDate: '', totalBudget: '', dailyBudget: '',
   publisherId: null, publisherName: '', slotId: null, slotName: '', adFile: null,
 };
 
@@ -60,10 +60,9 @@ export default function CreateCampaignForm({ publishers = [], onSubmit, loading 
               <Input label="End Date" type="date" value={form.endDate} onChange={(e) => update('endDate', e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Total Budget (₹)" type="number" value={form.budget} onChange={(e) => update('budget', e.target.value)} placeholder="50000" />
+              <Input label="Total Budget (₹)" type="number" value={form.totalBudget} onChange={(e) => update('totalBudget', e.target.value)} placeholder="50000" />
               <Input label="Daily Budget (₹)" type="number" value={form.dailyBudget} onChange={(e) => update('dailyBudget', e.target.value)} placeholder="5000" />
             </div>
-            <Input label="Target URL" type="url" value={form.targetUrl} onChange={(e) => update('targetUrl', e.target.value)} placeholder="https://yoursite.com" />
           </div>
         )}
 
@@ -119,7 +118,7 @@ export default function CreateCampaignForm({ publishers = [], onSubmit, loading 
                 ['Objective', form.objective],
                 ['Start Date', form.startDate],
                 ['End Date', form.endDate],
-                ['Total Budget', form.budget ? `₹${Number(form.budget).toLocaleString('en-IN')}` : '—'],
+                ['Total Budget', form.totalBudget ? `₹${Number(form.totalBudget).toLocaleString('en-IN')}` : '—'],
                 ['Daily Budget', form.dailyBudget ? `₹${Number(form.dailyBudget).toLocaleString('en-IN')}` : '—'],
                 ['Publisher', form.publisherName || '—'],
                 ['Ad Slot', form.slotName || '—'],

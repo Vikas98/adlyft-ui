@@ -34,7 +34,6 @@ export default function EditCampaign() {
     endDate: '',
     totalBudget: '',
     dailyBudget: '',
-    targetUrl: '',
   });
 
   useEffect(() => {
@@ -48,9 +47,8 @@ export default function EditCampaign() {
           status: c.status || 'draft',
           startDate: c.startDate ? c.startDate.slice(0, 10) : '',
           endDate: c.endDate ? c.endDate.slice(0, 10) : '',
-          totalBudget: c.totalBudget || c.budget || '',
+          totalBudget: c.totalBudget || '',
           dailyBudget: c.dailyBudget || '',
-          targetUrl: c.targetUrl || '',
         });
       } catch {
         navigate('/campaigns');
@@ -146,14 +144,6 @@ export default function EditCampaign() {
               placeholder="5000"
             />
           </div>
-
-          <Input
-            label="Target URL"
-            type="url"
-            value={form.targetUrl}
-            onChange={(e) => update('targetUrl', e.target.value)}
-            placeholder="https://yoursite.com"
-          />
 
           <div className="flex justify-end gap-3 pt-2">
             <Link to={`/campaigns/${id}`}>
