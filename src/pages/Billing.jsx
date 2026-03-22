@@ -18,8 +18,9 @@ export default function Billing() {
     const fetchData = async () => {
       try {
         const [ovRes, invRes] = await Promise.all([getBillingOverviewApi(), getInvoicesApi()]);
-        setOverview(ovRes.data);
-        setInvoices(invRes.data.invoices || invRes.data || []);
+        setOverview(ovRes.data?.data || ovRes.data || {});
+        const rawInvoices = invRes.data?.data;
+        setInvoices(Array.isArray(rawInvoices) ? rawInvoices : []);
       } catch {
         setOverview(mockBillingOverview);
         setInvoices(mockInvoices);

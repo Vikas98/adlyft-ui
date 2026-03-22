@@ -19,8 +19,8 @@ export default function Settings() {
     const fetchData = async () => {
       try {
         const [profRes, keyRes] = await Promise.all([getProfileApi(), getApiKeyApi()]);
-        setProfile(profRes.data);
-        setApiKey(keyRes.data.apiKey || '');
+        setProfile(profRes.data?.data || profRes.data);
+        setApiKey(keyRes.data?.data?.apiKey || keyRes.data?.apiKey || '');
       } catch {
         setProfile(mockProfile);
         setApiKey('adlyft_demo_key_xxxx1234');
@@ -50,7 +50,7 @@ export default function Settings() {
   const handleRegenerateKey = async () => {
     try {
       const res = await regenerateApiKeyApi();
-      setApiKey(res.data.apiKey || 'adlyft_new_key_xxxx5678');
+      setApiKey(res.data?.data?.apiKey || res.data?.apiKey || 'adlyft_new_key_xxxx5678');
     } catch {
       setApiKey('adlyft_demo_key_' + Math.random().toString(36).slice(2, 10));
     }

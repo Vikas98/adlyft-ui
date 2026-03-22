@@ -21,7 +21,8 @@ export default function Publishers() {
     const fetchPublishers = async () => {
       try {
         const res = await getPublishersApi();
-        setPublishers(res.data.publishers || res.data || []);
+        const rawPublishers = res.data?.data;
+        setPublishers(Array.isArray(rawPublishers) ? rawPublishers : []);
       } catch {
         setPublishers(mockPublishers);
         setIsDemo(true);
