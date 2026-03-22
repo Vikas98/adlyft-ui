@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, Eye, EyeOff } from 'lucide-react';
-import { getErrorMessage } from '../services/api';
 
 export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', company: '' });
@@ -45,7 +44,7 @@ export default function Register() {
       await register({ name: form.name, email: form.email, password: form.password, company: form.company });
       navigate('/');
     } catch (err) {
-      setApiError(getErrorMessage(err) || 'Registration failed. Please try again.');
+      setApiError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
