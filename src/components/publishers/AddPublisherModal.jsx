@@ -6,22 +6,28 @@ import Button from '../common/Button';
 
 const CATEGORY_OPTIONS = [
   { value: 'Transport', label: 'Transport' },
-  { value: 'Social', label: 'Social' },
-  { value: 'News', label: 'News' },
-  { value: 'Entertainment', label: 'Entertainment' },
-  { value: 'Finance', label: 'Finance' },
-  { value: 'Education', label: 'Education' },
-  { value: 'Health', label: 'Health' },
   { value: 'Gaming', label: 'Gaming' },
+  { value: 'News', label: 'News' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Food Delivery', label: 'Food Delivery' },
+  { value: 'Health & Fitness', label: 'Health & Fitness' },
+  { value: 'Education', label: 'Education' },
+  { value: 'Entertainment', label: 'Entertainment' },
   { value: 'Shopping', label: 'Shopping' },
-  { value: 'Other', label: 'Other' },
+  { value: 'Social', label: 'Social' },
 ];
 
 const PLATFORM_OPTIONS = [
   { value: 'Android', label: 'Android' },
   { value: 'iOS', label: 'iOS' },
-  { value: 'Both', label: 'Both' },
   { value: 'Web', label: 'Web' },
+  { value: 'All', label: 'All Platforms' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+  { value: 'pending', label: 'Pending' },
 ];
 
 const initialForm = {
@@ -30,8 +36,10 @@ const initialForm = {
   category: 'Transport',
   description: '',
   website: '',
-  dailyActiveUsers: '',
-  platform: 'Android',
+  dau: '',
+  platform: 'All',
+  avgCTR: '',
+  status: 'active',
   contactEmail: '',
 };
 
@@ -48,8 +56,10 @@ export default function AddPublisherModal({ isOpen, onClose, onSave, publisher }
         category: publisher.category || 'Transport',
         description: publisher.description || '',
         website: publisher.website || '',
-        dailyActiveUsers: publisher.dailyActiveUsers || publisher.dau || '',
-        platform: publisher.platform || 'Android',
+        dau: publisher.dau || '',
+        platform: publisher.platform || 'All',
+        avgCTR: publisher.avgCTR || '',
+        status: publisher.status || 'active',
         contactEmail: publisher.contactEmail || '',
       });
     } else {
@@ -95,7 +105,8 @@ export default function AddPublisherModal({ isOpen, onClose, onSave, publisher }
     try {
       const payload = {
         ...form,
-        dailyActiveUsers: form.dailyActiveUsers ? Number(form.dailyActiveUsers) : undefined,
+        dau: form.dau ? Number(form.dau) : undefined,
+        avgCTR: form.avgCTR ? Number(form.avgCTR) : undefined,
       };
       await onSave(payload);
       onClose();
@@ -168,9 +179,26 @@ export default function AddPublisherModal({ isOpen, onClose, onSave, publisher }
           <Input
             label="Daily Active Users"
             type="number"
-            value={form.dailyActiveUsers}
-            onChange={(e) => update('dailyActiveUsers', e.target.value)}
+            value={form.dau}
+            onChange={(e) => update('dau', e.target.value)}
             placeholder="75000"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Average CTR (%)"
+            type="number"
+            step="0.01"
+            value={form.avgCTR}
+            onChange={(e) => update('avgCTR', e.target.value)}
+            placeholder="3.5"
+          />
+          <Select
+            label="Status"
+            value={form.status}
+            onChange={(e) => update('status', e.target.value)}
+            options={STATUS_OPTIONS}
           />
         </div>
 

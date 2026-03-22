@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/common/Card';
 import CreateCampaignForm from '../components/campaigns/CreateCampaignForm';
-import { createCampaignApi, uploadAdApi, getPublishersApi } from '../services/api';
+import { createCampaignApi, getPublishersApi } from '../services/api';
 import { mockPublishers } from '../data/mockData';
 
 export default function CreateCampaign() {
@@ -26,28 +26,15 @@ export default function CreateCampaign() {
   const handleSubmit = async (form) => {
     setLoading(true);
     try {
-      // Upload ad creative if present
-      let adUrl = '';
-      if (form.adFile) {
-        const formData = new FormData();
-        formData.append('image', form.adFile);
-        try {
-          const uploadRes = await uploadAdApi(formData);
-          adUrl = uploadRes.data.url || '';
-        } catch { /* ignore upload errors in demo mode */ }
-      }
-
       const campaignData = {
         name: form.name,
         objective: form.objective,
         startDate: form.startDate,
         endDate: form.endDate,
-        totalBudget: Number(form.budget),
+        totalBudget: form.totalBudget ? Number(form.totalBudget) : undefined,
         dailyBudget: form.dailyBudget ? Number(form.dailyBudget) : undefined,
-        targetUrl: form.targetUrl,
         publisherId: form.publisherId,
         slotId: form.slotId,
-        adUrl,
       };
 
       await createCampaignApi(campaignData);
