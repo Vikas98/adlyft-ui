@@ -49,6 +49,16 @@ export const deletePublisherApi = (id) => api.delete(`/publishers/${id}`);
 
 // Slots
 export const getSlotsApi = (params) => api.get('/slots', { params });
+export const createSlotApi = (data) => api.post('/slots', data);
+export const updateSlotApi = (id, data) => api.put(`/slots/${id}`, data);
+export const deleteSlotApi = (id) => api.delete(`/slots/${id}`);
+
+// Notifications
+export const getNotificationsApi = (params) => api.get('/notifications', { params });
+export const getUnreadCountApi = () => api.get('/notifications/unread-count');
+export const markNotificationReadApi = (id) => api.put(`/notifications/${id}/read`);
+export const markAllNotificationsReadApi = () => api.put('/notifications/read-all');
+export const deleteNotificationApi = (id) => api.delete(`/notifications/${id}`);
 
 // Ads
 export const uploadAdApi = (formData) => api.post('/ads/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });

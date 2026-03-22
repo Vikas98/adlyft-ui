@@ -12,6 +12,8 @@ const pageTitles = {
   '/analytics': 'Analytics',
   '/billing': 'Billing',
   '/settings': 'Settings',
+  '/users': 'User Management',
+  '/my-slots': 'My Ad Slots',
 };
 
 export default function Layout() {

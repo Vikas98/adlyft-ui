@@ -13,12 +13,20 @@ import Publishers from './pages/Publishers';
 import Analytics from './pages/Analytics';
 import Billing from './pages/Billing';
 import Settings from './pages/Settings';
+import Users from './pages/Users';
+import MySlots from './pages/MySlots';
 import LoadingSpinner from './components/common/LoadingSpinner';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   if (loading) return <LoadingSpinner className="min-h-screen" size="lg" />;
   return isAuthenticated ? children : <Navigate to="/login" />;
+}
+
+function RoleRoute({ roles, children }) {
+  const { user } = useAuth();
+  if (!roles.includes(user?.role)) return <Navigate to="/" />;
+  return children;
 }
 
 export default function App() {
@@ -31,14 +39,16 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
-            <Route path="campaigns" element={<Campaigns />} />
-            <Route path="campaigns/create" element={<CreateCampaign />} />
-            <Route path="campaigns/:id" element={<CampaignDetail />} />
-            <Route path="campaigns/:id/edit" element={<EditCampaign />} />
-            <Route path="publishers" element={<Publishers />} />
+            <Route path="campaigns" element={<RoleRoute roles={['advertiser', 'admin']}><Campaigns /></RoleRoute>} />
+            <Route path="campaigns/create" element={<RoleRoute roles={['advertiser', 'admin']}><CreateCampaign /></RoleRoute>} />
+            <Route path="campaigns/:id" element={<RoleRoute roles={['advertiser', 'admin']}><CampaignDetail /></RoleRoute>} />
+            <Route path="campaigns/:id/edit" element={<RoleRoute roles={['advertiser', 'admin']}><EditCampaign /></RoleRoute>} />
+            <Route path="publishers" element={<RoleRoute roles={['advertiser', 'admin']}><Publishers /></RoleRoute>} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="billing" element={<Billing />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="users" element={<RoleRoute roles={['admin']}><Users /></RoleRoute>} />
+            <Route path="my-slots" element={<RoleRoute roles={['publisher']}><MySlots /></RoleRoute>} />
           </Route>
         </Routes>
         </BrowserRouter>

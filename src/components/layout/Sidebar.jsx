@@ -1,18 +1,10 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Megaphone, Building2, BarChart3, CreditCard, Settings, LogOut, Zap } from 'lucide-react';
+import { LayoutDashboard, Megaphone, Building2, BarChart3, CreditCard, Settings, LogOut, Zap, Users, Layout } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { ROLE_NAV_ITEMS, PORTAL_NAMES } from '../../utils/constants';
 
-const icons = { LayoutDashboard, Megaphone, Building2, BarChart3, CreditCard, Settings };
-
-const navItems = [
-  { path: '/', label: 'Dashboard', icon: 'LayoutDashboard', exact: true },
-  { path: '/campaigns', label: 'Campaigns', icon: 'Megaphone' },
-  { path: '/publishers', label: 'Publishers', icon: 'Building2' },
-  { path: '/analytics', label: 'Analytics', icon: 'BarChart3' },
-  { path: '/billing', label: 'Billing', icon: 'CreditCard' },
-  { path: '/settings', label: 'Settings', icon: 'Settings' },
-];
+const icons = { LayoutDashboard, Megaphone, Building2, BarChart3, CreditCard, Settings, Users, Layout };
 
 export default function Sidebar() {
   const { logout, user } = useAuth();
@@ -22,6 +14,10 @@ export default function Sidebar() {
     logout();
     navigate('/login');
   };
+
+  const role = user?.role || 'advertiser';
+  const navItems = ROLE_NAV_ITEMS[role] || ROLE_NAV_ITEMS.advertiser;
+  const portalName = PORTAL_NAMES[role] || 'Advertiser Portal';
 
   return (
     <div className="w-64 min-h-screen bg-primary-950 flex flex-col">
@@ -33,7 +29,7 @@ export default function Sidebar() {
           </div>
           <div>
             <span className="text-white font-bold text-lg">Adlyft</span>
-            <p className="text-primary-400 text-xs">Advertiser Portal</p>
+            <p className="text-primary-400 text-xs">{portalName}</p>
           </div>
         </div>
       </div>
@@ -55,7 +51,7 @@ export default function Sidebar() {
                 }`
               }
             >
-              <Icon className="h-5 w-5" />
+              {Icon && <Icon className="h-5 w-5" />}
               {item.label}
             </NavLink>
           );
@@ -71,7 +67,7 @@ export default function Sidebar() {
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-xs font-medium truncate">{user?.name || 'Advertiser'}</p>
+            <p className="text-white text-xs font-medium truncate">{user?.name || 'User'}</p>
             <p className="text-primary-400 text-xs truncate">{user?.email || ''}</p>
           </div>
         </div>
