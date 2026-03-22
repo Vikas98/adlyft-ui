@@ -27,6 +27,49 @@ api.interceptors.response.use(
   }
 );
 
+/**
+ * Extracts a user-friendly error message from an axios error.
+ */
+export function getErrorMessage(error) {
+  if (!error) return 'An unexpected error occurred.';
+
+  // Network / timeout errors (no response from server)
+  if (!error.response) {
+    if (error.code === 'ECONNABORTED') return 'Request timed out. Please try again.';
+    return 'Network error. Please check your connection.';
+  }
+
+  const { status, data } = error.response;
+
+  // Try to use the message from the response body first
+  const serverMessage =
+    data?.message ||
+    data?.error ||
+    (typeof data === 'string' && data) ||
+    null;
+
+  switch (status) {
+    case 400:
+      return serverMessage || 'Invalid request. Please check your input.';
+    case 403:
+      return "You don't have permission to perform this action.";
+    case 404:
+      return 'The requested resource was not found.';
+    case 422: {
+      // Validation errors — may come as array of { field, message }
+      if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        return data.errors.map((e) => e.message || e.msg || JSON.stringify(e)).join(' ');
+      }
+      return serverMessage || 'Validation failed. Please check your input.';
+    }
+    case 429:
+      return 'Too many requests. Please try again later.';
+    default:
+      if (status >= 500) return 'Server error. Please try again later.';
+      return serverMessage || `Request failed with status ${status}.`;
+  }
+}
+
 // Auth
 export const loginApi = (email, password) => api.post('/auth/login', { email, password });
 export const registerApi = (data) => api.post('/auth/register', data);
