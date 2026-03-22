@@ -26,8 +26,9 @@ export default function Analytics() {
           getAnalyticsTimeseriesApi(range),
           getAnalyticsCampaignsApi(),
         ]);
-        setTimeseries(tsRes.data.data || tsRes.data || []);
-        setTopCampaigns(campRes.data.campaigns || campRes.data || []);
+        setTimeseries(tsRes.data?.data || []);
+        const rawCampaigns = campRes.data?.data;
+        setTopCampaigns(Array.isArray(rawCampaigns) ? rawCampaigns : []);
       } catch {
         const days = range === '7d' ? 7 : range === '90d' ? 90 : 30;
         setTimeseries(mockTimeseries.slice(-days));

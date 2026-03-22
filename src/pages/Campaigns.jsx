@@ -16,7 +16,8 @@ export default function Campaigns() {
     const fetchCampaigns = async () => {
       try {
         const res = await getCampaignsApi();
-        setCampaigns(res.data.campaigns || res.data || []);
+        const rawCampaigns = res.data?.data;
+        setCampaigns(Array.isArray(rawCampaigns) ? rawCampaigns : []);
       } catch {
         setCampaigns(mockCampaigns);
         setIsDemo(true);

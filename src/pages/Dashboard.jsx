@@ -28,9 +28,10 @@ export default function Dashboard() {
           getAnalyticsTimeseriesApi('30d'),
           getCampaignsApi({ status: 'active' }),
         ]);
-        setOverview(ovRes.data);
-        setTimeseries(tsRes.data.data || tsRes.data || []);
-        setCampaigns(campRes.data.campaigns || campRes.data || []);
+        setOverview(ovRes.data?.data || ovRes.data || {});
+        setTimeseries(tsRes.data?.data || []);
+        const rawCampaigns = campRes.data?.data;
+        setCampaigns(Array.isArray(rawCampaigns) ? rawCampaigns : []);
         setActivities([]);
       } catch (err) {
         console.error('Dashboard data fetch error:', err);

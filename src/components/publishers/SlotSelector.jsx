@@ -15,7 +15,8 @@ export default function SlotSelector({ publisherId, selectedSlotId, onSelect }) 
       setLoading(true);
       try {
         const res = await getSlotsApi({ publisherId });
-        setSlots(res.data.slots || res.data || []);
+        const rawSlots = res.data?.data;
+        setSlots(Array.isArray(rawSlots) ? rawSlots : []);
       } catch {
         setSlots(mockSlots.filter((s) => s.publisherId === publisherId));
       } finally {
