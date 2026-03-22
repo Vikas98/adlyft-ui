@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, Eye, EyeOff } from 'lucide-react';
-import { getErrorMessage } from '../services/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,7 +20,7 @@ export default function Login() {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      setError(getErrorMessage(err) || 'Login failed. Please check your credentials.');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

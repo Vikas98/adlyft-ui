@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login';
@@ -23,25 +22,6 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <ErrorBoundary>
-      <ToastProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-                <Route index element={<Dashboard />} />
-                <Route path="campaigns" element={<Campaigns />} />
-                <Route path="campaigns/create" element={<CreateCampaign />} />
-                <Route path="publishers" element={<Publishers />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="billing" element={<Billing />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </ToastProvider>
       <AuthProvider>
         <BrowserRouter>
         <Routes>

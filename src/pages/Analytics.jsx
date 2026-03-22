@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import Card from '../components/common/Card';
 import ImpressionsChart from '../components/analytics/ImpressionsChart';
 import ClicksChart from '../components/analytics/ClicksChart';
 import CTRChart from '../components/analytics/CTRChart';
 import SpendChart from '../components/analytics/SpendChart';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import Button from '../components/common/Button';
 import { getAnalyticsTimeseriesApi, getAnalyticsCampaignsApi } from '../services/api';
 import { mockTimeseries, mockCampaigns } from '../data/mockData';
-import { getErrorMessage } from '../services/api';
 
 const RANGES = ['7d', '30d', '90d'];
 
@@ -19,23 +17,7 @@ export default function Analytics() {
   const [topCampaigns, setTopCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
-  const [error, setError] = useState('');
 
-  const fetchData = async (selectedRange) => {
-    setLoading(true);
-    setError('');
-    try {
-      const [tsRes, campRes] = await Promise.all([
-        getAnalyticsTimeseriesApi(selectedRange),
-        getAnalyticsCampaignsApi(),
-      ]);
-      setTimeseries(tsRes.data.data || tsRes.data || []);
-      setTopCampaigns(campRes.data.campaigns || campRes.data || []);
-      setIsDemo(false);
-    } catch (err) {
-      const msg = getErrorMessage(err);
-      if (!navigator.onLine || msg.includes('Network')) {
-        const days = selectedRange === '7d' ? 7 : selectedRange === '90d' ? 90 : 30;
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -52,32 +34,16 @@ export default function Analytics() {
         setTimeseries(mockTimeseries.slice(-days));
         setTopCampaigns(mockCampaigns);
         setIsDemo(true);
-      } else {
-        setError(msg);
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchData(range); }, [range]);
+    };
+    fetchData();
+  }, [range]);
 
   const chartData = timeseries.map((d) => ({ ...d, date: d.date?.slice(5) || d.date }));
 
   if (loading) return <LoadingSpinner className="h-64" size="lg" />;
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="bg-white rounded-xl border border-red-100 shadow-sm p-8 max-w-md w-full text-center">
-          <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-3" />
-          <p className="text-gray-700 font-medium mb-1">Failed to load analytics</p>
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
-          <Button onClick={() => fetchData(range)}><RefreshCw className="h-4 w-4" />Retry</Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
