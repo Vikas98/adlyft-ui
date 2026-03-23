@@ -13,7 +13,7 @@ export default function AdvertiserDashboard() {
 
   useEffect(() => {
     getAdvertiserStats()
-      .then((res) => setStats(res.data))
+      .then((res) => setStats(res.data?.data || {}))
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
   }, []);

@@ -14,7 +14,7 @@ export default function MySlots() {
   const fetchSlots = () => {
     setLoading(true);
     getMySlots()
-      .then((res) => setSlots(res.data?.slots || res.data || []))
+      .then((res) => setSlots(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setSlots([]))
       .finally(() => setLoading(false));
   };

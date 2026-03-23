@@ -16,7 +16,7 @@ export default function EditCampaign() {
   useEffect(() => {
     getCampaign(id)
       .then((res) => {
-        const c = res.data?.campaign || res.data;
+        const c = res.data?.data || res.data;
         setForm({
           name: c.name || '',
           description: c.description || '',

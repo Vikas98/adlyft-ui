@@ -15,7 +15,7 @@ export default function AllCampaigns() {
     setLoading(true);
     const params = status !== 'all' ? { status } : {};
     getAllCampaigns(params)
-      .then((res) => setCampaigns(res.data?.campaigns || res.data || []))
+      .then((res) => setCampaigns(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setCampaigns([]))
       .finally(() => setLoading(false));
   }, [status]);

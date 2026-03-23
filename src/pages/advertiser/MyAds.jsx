@@ -18,7 +18,7 @@ export default function MyAds() {
     setLoading(true);
     const params = tab !== 'all' ? { status: tab } : {};
     getMyAds(params)
-      .then((res) => setAds(res.data?.ads || res.data || []))
+      .then((res) => setAds(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setAds([]))
       .finally(() => setLoading(false));
   }, [tab]);

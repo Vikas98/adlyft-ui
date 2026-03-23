@@ -13,7 +13,7 @@ export default function PublisherDashboard() {
 
   useEffect(() => {
     getPublisherStats()
-      .then((res) => setStats(res.data))
+      .then((res) => setStats(res.data?.data || {}))
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
   }, []);

@@ -13,8 +13,8 @@ export default function PublisherAnalytics() {
   useEffect(() => {
     Promise.all([getPublisherAnalytics(), getSlotAnalytics()])
       .then(([ovRes, slotRes]) => {
-        setOverview(ovRes.data);
-        setSlotData(slotRes.data?.slots || slotRes.data || []);
+        setOverview(ovRes.data?.data || null);
+        setSlotData(Array.isArray(slotRes.data?.data) ? slotRes.data.data : []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

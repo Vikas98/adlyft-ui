@@ -18,7 +18,7 @@ export default function AdvertiserPublishers() {
     if (search) params.search = search;
     if (category) params.category = category;
     getPublishers(params)
-      .then((res) => setPublishers(res.data?.publishers || res.data || []))
+      .then((res) => setPublishers(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setPublishers([]))
       .finally(() => setLoading(false));
   };

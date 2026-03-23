@@ -16,7 +16,7 @@ export default function AdminAdvertisers() {
     setLoading(true);
     const params = search ? { search } : {};
     getAdvertisers(params)
-      .then((res) => setAdvertisers(res.data?.advertisers || res.data || []))
+      .then((res) => setAdvertisers(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setAdvertisers([]))
       .finally(() => setLoading(false));
   };

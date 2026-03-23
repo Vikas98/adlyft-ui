@@ -14,7 +14,7 @@ export default function Campaigns() {
   const fetchCampaigns = () => {
     setLoading(true);
     getMyCampaigns()
-      .then((res) => setCampaigns(res.data?.campaigns || res.data || []))
+      .then((res) => setCampaigns(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setCampaigns([]))
       .finally(() => setLoading(false));
   };

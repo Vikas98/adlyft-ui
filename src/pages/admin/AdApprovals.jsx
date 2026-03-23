@@ -17,7 +17,7 @@ export default function AdApprovals() {
   const fetchAds = () => {
     setLoading(true);
     getAds({ status: tab })
-      .then((res) => setAds(res.data?.ads || res.data || []))
+      .then((res) => setAds(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setAds([]))
       .finally(() => setLoading(false));
   };

@@ -21,10 +21,10 @@ export default function CreateAd() {
 
   useEffect(() => {
     getPublishers({ status: 'approved' })
-      .then((res) => setPublishers(res.data?.publishers || res.data || []))
+      .then((res) => setPublishers(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => {});
     getMyCampaigns()
-      .then((res) => setCampaigns(res.data?.campaigns || res.data || []))
+      .then((res) => setCampaigns(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => {});
   }, []);
 
@@ -33,7 +33,7 @@ export default function CreateAd() {
     setLoading(true);
     try {
       const res = await getPublisher(pub._id || pub.id);
-      const data = res.data;
+      const data = res.data?.data;
       setSlots(data?.slots || data?.activeSlots || []);
     } catch { setSlots([]); }
     finally { setLoading(false); }
