@@ -14,7 +14,7 @@ export default function AdminUsers() {
     setLoading(true);
     const params = search ? { search } : {};
     getUsers(params)
-      .then((res) => setUsers(res.data?.users || res.data || []))
+      .then((res) => setUsers(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
   };

@@ -23,7 +23,7 @@ export default function AdminPublishers() {
     if (tab !== 'all') params.status = tab;
     if (search) params.search = search;
     getPublishers(params)
-      .then((res) => setPublishers(res.data?.publishers || res.data || []))
+      .then((res) => setPublishers(Array.isArray(res.data?.data) ? res.data.data : []))
       .catch(() => setPublishers([]))
       .finally(() => setLoading(false));
   };

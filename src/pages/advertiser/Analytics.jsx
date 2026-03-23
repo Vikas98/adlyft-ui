@@ -11,7 +11,7 @@ export default function AdvertiserAnalytics() {
 
   useEffect(() => {
     getAdvertiserAnalytics()
-      .then((res) => setData(res.data))
+      .then((res) => setData(res.data?.data || {}))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, []);

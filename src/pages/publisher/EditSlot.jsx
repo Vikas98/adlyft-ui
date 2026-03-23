@@ -19,7 +19,7 @@ export default function EditSlot() {
   useEffect(() => {
     getSlot(id)
       .then((res) => {
-        const s = res.data?.slot || res.data;
+        const s = res.data?.data || res.data;
         setForm({
           name: s.name || '',
           description: s.description || '',

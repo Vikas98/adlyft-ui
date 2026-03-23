@@ -13,7 +13,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     getAdminStats()
-      .then((res) => setStats(res.data))
+      .then((res) => setStats(res.data?.data || {}))
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
   }, []);

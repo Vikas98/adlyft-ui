@@ -13,8 +13,8 @@ export default function Billing() {
   useEffect(() => {
     Promise.all([getBillingSummary(), getInvoices()])
       .then(([sumRes, invRes]) => {
-        setSummary(sumRes.data?.summary || sumRes.data);
-        setInvoices(invRes.data?.invoices || invRes.data || []);
+        setSummary(sumRes.data?.data || null);
+        setInvoices(Array.isArray(invRes.data?.data) ? invRes.data.data : []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

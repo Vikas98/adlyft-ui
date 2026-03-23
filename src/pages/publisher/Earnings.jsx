@@ -10,7 +10,7 @@ export default function Earnings() {
 
   useEffect(() => {
     getEarnings()
-      .then((res) => setData(res.data))
+      .then((res) => setData(res.data?.data || null))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, []);

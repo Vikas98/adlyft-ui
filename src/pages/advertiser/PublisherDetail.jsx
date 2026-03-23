@@ -12,7 +12,7 @@ export default function AdvertiserPublisherDetail() {
 
   useEffect(() => {
     getPublisher(id)
-      .then((res) => setData(res.data))
+      .then((res) => setData(res.data?.data || null))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, [id]);

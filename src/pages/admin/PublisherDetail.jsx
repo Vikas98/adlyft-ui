@@ -16,7 +16,7 @@ export default function PublisherDetail() {
   const fetch = () => {
     setLoading(true);
     getPublisher(id)
-      .then((res) => setData(res.data))
+      .then((res) => setData(res.data?.data || null))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   };

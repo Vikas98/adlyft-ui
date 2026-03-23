@@ -20,7 +20,7 @@ export default function AdminAnalytics() {
   useEffect(() => {
     setLoading(true);
     getAdminAnalytics({ range })
-      .then((res) => setData(res.data))
+      .then((res) => setData(res.data?.data || null))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, [range]);
