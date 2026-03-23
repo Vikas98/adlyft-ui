@@ -1,0 +1,20 @@
+import api from './api';
+
+export const getAdvertiserStats = () => api.get('/advertiser/dashboard/stats');
+export const getMyCampaigns = () => api.get('/advertiser/campaigns');
+export const createCampaign = (data) => api.post('/advertiser/campaigns', data);
+export const getCampaign = (id) => api.get(`/advertiser/campaigns/${id}`);
+export const updateCampaign = (id, data) => api.put(`/advertiser/campaigns/${id}`, data);
+export const deleteCampaign = (id) => api.delete(`/advertiser/campaigns/${id}`);
+export const pauseCampaign = (id) => api.put(`/advertiser/campaigns/${id}/pause`);
+export const resumeCampaign = (id) => api.put(`/advertiser/campaigns/${id}/resume`);
+export const getMyAds = (params) => api.get('/advertiser/ads', { params });
+export const createAd = (data) => api.post('/advertiser/ads', data);
+export const getAd = (id) => api.get(`/advertiser/ads/${id}`);
+export const updateAd = (id, data) => api.put(`/advertiser/ads/${id}`, data);
+export const deleteAd = (id) => api.delete(`/advertiser/ads/${id}`);
+export const getPublishers = (params) => api.get('/advertiser/publishers', { params });
+export const getPublisher = (id) => api.get(`/advertiser/publishers/${id}`);
+export const getAdvertiserAnalytics = () => api.get('/advertiser/analytics/overview');
+export const getBillingSummary = () => api.get('/advertiser/billing/summary');
+export const getInvoices = () => api.get('/advertiser/billing/invoices');
