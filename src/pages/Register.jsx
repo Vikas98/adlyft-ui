@@ -1,164 +1,185 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Zap, Eye, EyeOff } from 'lucide-react';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+
+const CATEGORIES = ['technology', 'fashion', 'finance', 'sports', 'entertainment', 'health', 'travel', 'other'];
 
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', company: '' });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [apiError, setApiError] = useState('');
-  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [role, setRole] = useState('advertiser');
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    website: '',
+    category: '',
+    company: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    if (!form.name.trim()) newErrors.name = 'Full name is required.';
-    if (!form.email.trim()) newErrors.email = 'Email is required.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = 'Please enter a valid email address.';
-    if (!form.password) newErrors.password = 'Password is required.';
-    else if (form.password.length < 6) newErrors.password = 'Password must be at least 6 characters.';
-    if (!form.confirmPassword) newErrors.confirmPassword = 'Please confirm your password.';
-    else if (form.password !== form.confirmPassword) newErrors.confirmPassword = 'Passwords do not match.';
-    return newErrors;
-  };
+  const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setApiError('');
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    setError('');
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
     setLoading(true);
     try {
-      await register({ name: form.name, email: form.email, password: form.password, company: form.company });
-      navigate('/');
+      const payload = { name: form.name, email: form.email, password: form.password, role };
+      if (role === 'publisher') {
+        payload.website = form.website;
+        payload.category = form.category;
+      } else {
+        payload.company = form.company;
+      }
+      const user = await register(payload);
+      if (user.role === 'publisher') {
+        navigate('/pending-approval');
+      } else {
+        navigate('/advertiser');
+      }
     } catch (err) {
-      setApiError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center">
-            <Zap className="h-7 w-7 text-white" />
-          </div>
-          <div>
-            <h1 className="text-white text-2xl font-bold">Adlyft</h1>
-            <p className="text-primary-400 text-sm">Elevate Your Reach</p>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Adlyft</h1>
+          <p className="text-gray-500 mt-2">Create your account</p>
         </div>
-
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">Create an account</h2>
-          <p className="text-sm text-gray-500 mb-6">Sign up to start advertising with Adlyft</p>
-
-          {apiError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-xs text-red-600">{apiError}</p>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+              {error}
             </div>
           )}
+
+          {/* Role selector */}
+          <div className="flex rounded-lg border border-gray-300 overflow-hidden mb-6">
+            {['advertiser', 'publisher'].map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={`flex-1 py-2 text-sm font-medium transition-colors capitalize ${
+                  role === r ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
               <input
                 type="text"
-                name="name"
                 value={form.name}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                onChange={set('name')}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
                 type="email"
-                name="email"
                 value={form.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                onChange={set('email')}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10"
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10"
-                />
-                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name <span className="text-gray-400 font-normal">(optional)</span></label>
               <input
-                type="text"
-                name="company"
-                value={form.company}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                type="password"
+                value={form.password}
+                onChange={set('password')}
+                required
+                minLength={6}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+              <input
+                type="password"
+                value={form.confirmPassword}
+                onChange={set('confirmPassword')}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {role === 'publisher' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
+                  <input
+                    type="url"
+                    value={form.website}
+                    onChange={set('website')}
+                    required
+                    placeholder="https://yourwebsite.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Website Category</label>
+                  <select
+                    value={form.category}
+                    onChange={set('category')}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select category</option>
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c} className="capitalize">{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+
+            {role === 'advertiser' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                <input
+                  type="text"
+                  value={form.company}
+                  onChange={set('company')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+              className="w-full py-2 px-4 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? <LoadingSpinner size="sm" /> : 'Create Account'}
             </button>
           </form>
-
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="mt-4 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">Sign In</Link>
+            <Link to="/login" className="text-blue-600 hover:underline font-medium">
+              Sign In
+            </Link>
           </p>
         </div>
       </div>
