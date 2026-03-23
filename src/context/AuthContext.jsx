@@ -1,59 +1,54 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginApi, registerApi, getMeApi } from '../services/api';
+import { loginApi, registerApi, getMeApi } from '../services/auth.service';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('adlyft_token'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const storedToken = localStorage.getItem('adlyft_token');
-      const storedUser = localStorage.getItem('adlyft_user');
-      if (storedToken && storedUser) {
-        setToken(storedToken);
+    const storedToken = localStorage.getItem('adlyft_token');
+    const storedUser = localStorage.getItem('adlyft_user');
+    if (storedToken && storedUser) {
+      try {
         setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem('adlyft_token');
+        localStorage.removeItem('adlyft_user');
       }
-      setLoading(false);
-    };
-    initAuth();
+    }
+    setLoading(false);
   }, []);
 
   const login = async (email, password) => {
     const response = await loginApi(email, password);
-    const { token: newToken, user: newUser } = response.data;
-    localStorage.setItem('adlyft_token', newToken);
+    const { token, user: newUser } = response.data;
+    localStorage.setItem('adlyft_token', token);
     localStorage.setItem('adlyft_user', JSON.stringify(newUser));
-    setToken(newToken);
     setUser(newUser);
-    setLoading(false);
     return newUser;
   };
 
-  const register = async ({ name, email, password, company }) => {
-    const response = await registerApi({ name, email, password, company });
-    const { token: newToken, user: newUser } = response.data;
-    localStorage.setItem('adlyft_token', newToken);
+  const register = async (data) => {
+    const response = await registerApi(data);
+    const { token, user: newUser } = response.data;
+    localStorage.setItem('adlyft_token', token);
     localStorage.setItem('adlyft_user', JSON.stringify(newUser));
-    setToken(newToken);
     setUser(newUser);
-    setLoading(false);
     return newUser;
   };
 
   const logout = () => {
     localStorage.removeItem('adlyft_token');
     localStorage.removeItem('adlyft_user');
-    setToken(null);
     setUser(null);
   };
 
-  const isAuthenticated = !!token;
+  const isAuthenticated = !!localStorage.getItem('adlyft_token') && !!user;
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated, loading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
