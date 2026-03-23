@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const isAuthenticated = !!localStorage.getItem('adlyft_token') && !!user;
+  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, logout }}>
